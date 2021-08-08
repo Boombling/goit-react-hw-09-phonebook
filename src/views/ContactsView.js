@@ -1,16 +1,15 @@
-import React, { Component } from 'react';
+import React, {useEffect} from 'react';
 import PhoneBook from '../components/Phonebook/Phonebook';
 import ContactList from '../components/ContactsList/ContactsList';
 import FilterContact from '../components/FilterContact/FilterContact';
-import { connect } from "react-redux";
+import { useDispatch } from "react-redux";
 import '../App.css';
 import { phonebookOperations } from '../redux/phonebook';
 
-class App extends Component {
-  componentDidMount() {
-    this.props.fetchContacts();
-  }
-  render() {
+export default function App (){
+  const dispatch = useDispatch();
+  useEffect(() => { dispatch(phonebookOperations.fetchContacts()) }, [dispatch])
+
     return (
       <div>
         <h1 className='title'>PhoneBook</h1>
@@ -20,11 +19,4 @@ class App extends Component {
         <ContactList  />
       </div>
     )
-  }
 }
-
-const mapDispatchToProps = (dispatch) => ({
-  fetchContacts: () => dispatch(phonebookOperations.fetchContacts()),
-});
-
-export default connect(null, mapDispatchToProps)(App);

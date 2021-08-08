@@ -1,44 +1,40 @@
-import React, { Component } from 'react';
+import React, { useState,  useCallback } from 'react';
 import shortid from 'shortid';
 import styles from './Phonebook.module.css';
-import { connect } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { phonebookOperations } from '../../redux/phonebook';
 
-class PhoneBook extends Component {
-    state = {
-        // contacts: [],
-        name: '',
-        number: ''
-    }
-    nameInputId = shortid.generate();
-    numberInputId = shortid.generate();
+export default function PhoneBook() {
+    const dispatch = useDispatch();
+    const [name, setName] = useState('')
+    const [number, setNumber] = useState('')
 
-    handleChange = evt => {
-        const { name, value } = evt.currentTarget;
-        this.setState({
-            id: shortid.generate(),
-            [name]: value,
-        })
-    };
+    const nameInputId = shortid.generate();
+    const numberInputId = shortid.generate();
 
-    handleSubmit = evt => {
+
+    const handleNameChange = useCallback(e => {
+        setName(e.currentTarget.value)
+    }, [])
+    const handleNumberChange = useCallback(e => {
+        setNumber(e.currentTarget.value)
+    }, [])
+
+    const handleSubmit = evt => {
         evt.preventDefault();
-        // console.log(`${this.state}`);
-        this.props.onSubmit(this.state);
+        dispatch(phonebookOperations.submit({ id: shortid.generate(), name, number }))
 
-        this.reset();
+        reset();
     };
 
-    reset = () => {
-        this.setState({ name: '', number: '' })
+    const reset = () => {
+        setName('')
+        setNumber('')
     }
-
-    render() {
-        const { name, number } = this.state;
         return (
             <div className={styles.section}>
-                <form onSubmit={this.handleSubmit} className={styles.form}>
-                    <label htmlFor={this.nameInputId} className={styles.lable} >
+                <form onSubmit={handleSubmit} className={styles.form}>
+                    <label htmlFor={nameInputId} className={styles.lable} >
                         Name
                         <br/>
                         <input
@@ -48,12 +44,12 @@ class PhoneBook extends Component {
                             title="Имя может состоять только из букв, апострофа, тире и пробелов. Например Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan и т. п."
                             required
                             value={name}
-                            onChange={this.handleChange}
-                            id={this.nameInputId}
+                            onChange={handleNameChange}
+                            id={nameInputId}
                             className={styles.input}
                         />
                     </label>
-                    <label htmlFor={this.numberInputId} className={styles.lable}>
+                    <label htmlFor={numberInputId} className={styles.lable}>
                         Number
                         <br/>
                         <input
@@ -63,8 +59,8 @@ class PhoneBook extends Component {
                             title="Номер телефона должен состоять цифр и может содержать пробелы, тире, круглые скобки и может начинаться с +"
                             required
                             value={number}
-                            onChange={this.handleChange}
-                            id={this.numberInputId}
+                            onChange={handleNumberChange}
+                            id={numberInputId}
                             className={styles.input}
                         />
                     </label>
@@ -72,10 +68,4 @@ class PhoneBook extends Component {
                 </form>
             </div>
         )
-    }
 }
-const mapDispatchToProps = dispatch => ({
-    onSubmit: (contact) => dispatch(phonebookOperations.submit(contact))
-})
-
-export default connect(null, mapDispatchToProps)(PhoneBook);
